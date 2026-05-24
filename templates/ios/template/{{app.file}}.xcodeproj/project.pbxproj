@@ -347,7 +347,7 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				/*CODE_SIGN_ENTITLEMENTS = "::APP_FILE::/::APP_FILE::.entitlements";
+				CODE_SIGN_ENTITLEMENTS = "::APP_FILE::/::APP_FILE::.entitlements";
 				::if DEVELOPMENT_TEAM_ID::DEVELOPMENT_TEAM = ::DEVELOPMENT_TEAM_ID::;::end::
 				ENABLE_BITCODE = ::if (ENABLE_BITCODE)::YES::else::NO::end::;
 				FRAMEWORK_SEARCH_PATHS = (
