@@ -543,13 +543,6 @@ class IOSPlatform extends PlatformTarget
 			}
 		}
 
-		// var manifest = new Asset ();
-		// manifest.id = "__manifest__";
-		// manifest.data = AssetHelper.createManifest (project).serialize ();
-		// manifest.resourceName = manifest.flatName = manifest.targetPath = "manifest";
-		// manifest.type = AssetType.TEXT;
-		// project.assets.push (manifest);
-
 		var context = generateContext();
 		context.OUTPUT_DIR = targetDirectory;
 
@@ -561,26 +554,16 @@ class IOSPlatform extends PlatformTarget
 		System.mkdir(projectDirectory + "/haxe/lime/installer");
 
 		var iconSizes:Array<IconSize> = [
-			{name: "Icon-20.png", size: 20},
-			{name: "Icon-Small.png", size: 29},
-			{name: "Icon-Small-40.png", size: 40},
 			{name: "Icon-20@2x.png", size: 40},
-			{name: "Icon-Small-50.png", size: 50},
-			{name: "Icon.png", size: 57},
-			{name: "Icon-Small@2x.png", size: 58},
 			{name: "Icon-20@3x.png", size: 60},
-			{name: "Icon-72.png", size: 72},
-			{name: "Icon-76.png", size: 76},
-			{name: "Icon-Small-40@2x.png", size: 80},
+			{name: "Icon-Small@2x.png", size: 58},
 			{name: "Icon-Small@3x.png", size: 87},
-			{name: "Icon-Small-50@2x.png", size: 100},
-			{name: "Icon@2x.png", size: 114},
-			{name: "Icon-60@2x.png", size: 120},
+			{name: "Icon-Small-40@2x.png", size: 80},
 			{name: "Icon-Small-40@3x.png", size: 120},
-			{name: "Icon-72@2x.png", size: 144},
+			{name: "Icon-60@2x.png", size: 120},
+			{name: "Icon-60@3x.png", size: 180},
 			{name: "Icon-76@2x.png", size: 152},
 			{name: "Icon-83.5@2x.png", size: 167},
-			{name: "Icon-60@3x.png", size: 180},
 			{name: "Icon-Marketing.png", size: 1024}
 		];
 
@@ -697,60 +680,6 @@ class IOSPlatform extends PlatformTarget
 				System.copyFile(sb.path, projectDirectory + Path.withoutDirectory(sb.path));
 				context.IOS_LAUNCH_STORYBOARD = Path.withoutDirectory(Path.withoutExtension(sb.path));
 			}
-		}
-		else
-		{
-			var splashSizes:Array<SplashSize> = [
-				{name: "Default.png", w: 320, h: 480}, // iPhone, portrait
-				{name: "Default@2x.png", w: 640, h: 960}, // iPhone Retina, portrait
-				{name: "Default-568h@2x.png", w: 640, h: 1136}, // iPhone 5, portrait
-				{name: "Default-667h@2x.png", w: 750, h: 1334}, // iPhone 6, portrait
-				{name: "Default-736h@3x.png", w: 1242, h: 2208}, // iPhone 6 Plus, portrait
-				{name: "Default-Landscape.png", w: 1024, h: 768}, // iPad, landscape
-				{name: "Default-Landscape@2x.png", w: 2048, h: 1536}, // iPad Retina, landscape
-				{name: "Default-736h-Landscape@3x.png", w: 2208, h: 1242}, // iPhone 6 Plus, landscape
-				{name: "Default-Portrait.png", w: 768, h: 1024}, // iPad, portrait
-				{name: "Default-Portrait@2x.png", w: 1536, h: 2048}, // iPad Retina, portrait
-				{name: "Default-812h@3x.png", w: 1125, h: 2436}, // iPhone X, portrait
-				{name: "Default-Landscape-812h@3x.png", w: 2436, h: 1125} // iPhone X, landscape
-			];
-
-			var splashScreenPath = Path.combine(projectDirectory, "Images.xcassets/LaunchImage.launchimage");
-			System.mkdir(splashScreenPath);
-
-			for (size in splashSizes)
-			{
-				var match = false;
-
-				for (splashScreen in project.splashScreens)
-				{
-					if (splashScreen.width == size.w && splashScreen.height == size.h && Path.extension(splashScreen.path) == "png")
-					{
-						System.copyFile(splashScreen.path, Path.combine(splashScreenPath, size.name));
-						match = true;
-					}
-				}
-
-				if (!match)
-				{
-					var imagePath = Path.combine(splashScreenPath, size.name);
-
-					if (!FileSystem.exists(imagePath))
-					{
-						#if (lime && lime_cffi && !macro)
-						Log.info("", " - \x1b[1mGenerating image:\x1b[0m " + imagePath);
-
-						var background = project.window.background != null ? project.window.background & 0xFFFFFF : 0x000000;
-						var image = new Image(null, 0, 0, size.w, size.h, (0xFF << 24) | background);
-						var bytes = image.encode(PNG);
-
-						File.saveBytes(imagePath, bytes);
-						#end
-					}
-				}
-			}
-
-			context.HAS_LAUNCH_IMAGE = true;
 		}
 
 		System.mkdir(projectDirectory + "/resources");
@@ -889,25 +818,6 @@ class IOSPlatform extends PlatformTarget
 		}
 	}
 
-	/*private function updateLaunchImage () {
-
-		var destination = buildDirectory + "/ios";
-		System.mkdir (destination);
-
-		var has_launch_image = false;
-		if (launchImages.length > 0) has_launch_image = true;
-
-		for (launchImage in launchImages) {
-
-			var splitPath = launchImage.name.split ("/");
-			var path = destination + "/" + splitPath[splitPath.length - 1];
-			System.copyFile (launchImage.name, path, context, false);
-
-		}
-
-		context.HAS_LAUNCH_IMAGE = has_launch_image;
-
-	}*/
 	public override function watch():Void
 	{
 		var hxml = getDisplayHXML();
@@ -934,11 +844,4 @@ private typedef IconSize =
 {
 	name:String,
 	size:Int,
-}
-
-private typedef SplashSize =
-{
-	name:String,
-	w:Int,
-	h:Int,
 }
