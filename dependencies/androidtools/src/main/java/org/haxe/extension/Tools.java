@@ -139,19 +139,13 @@ public class Tools extends Extension
 	}
 
 	/**
-	 * Shows an alert dialog with optional positive and negative buttons.
+	 * Shows an alert dialog.
 	 *
-	 * @param title The title of the alert dialog (optional).
+	 * @param title The title of the alert dialog.
 	 * @param message The message to display in the alert dialog.
-	 * @param positiveLabel The label for the positive button (optional).
-	 * @param positiveObject The HaxeObject to call when the positive button is clicked (optional).
-	 * @param negativeLabel The label for the negative button (optional).
-	 * @param negativeObject The HaxeObject to call when the negative button is clicked (optional).
 	 */
-	public static void showAlertDialog(final String title, final String message, final String positiveLabel, final HaxeObject positiveObject, final String negativeLabel, final HaxeObject negativeObject)
+	public static void showAlertDialog(final String title, final String message)
 	{
-		final Object lock = new Object();
-
 		mainActivity.runOnUiThread(new Runnable()
 		{
 			@Override
@@ -160,84 +154,30 @@ public class Tools extends Extension
 				try
 				{
 					final AlertDialog.Builder builder = new AlertDialog.Builder(mainContext, android.R.style.Theme_Material_Dialog_Alert);
-
-					if (title != null)
+					
+					if (title != null && !title.isEmpty())
 						builder.setTitle(title);
-
-					builder.setCancelable(false);
-
-					TextView messageView = new TextView(mainContext);
-					messageView.setPadding(20, 20, 20, 20);
-					messageView.setText(message);
-
-					ScrollView scrollView = new ScrollView(mainContext);
-					scrollView.setLayoutParams(new LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, 300));
-					scrollView.addView(messageView);
-
-					builder.setView(scrollView);
-
-					if (positiveLabel != null)
-					{
-						builder.setPositiveButton(positiveLabel, new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-								dialog.dismiss();
-
-								if (positiveObject != null)
-									positiveObject.call("onClick", new Object[]{});
-							}
-						});
-					}
-
-					if (negativeLabel != null)
-					{
-						builder.setNegativeButton(negativeLabel, new DialogInterface.OnClickListener()
-						{
-							@Override
-							public void onClick(DialogInterface dialog, int which)
-							{
-								dialog.dismiss();
-
-								if (negativeObject != null)
-									negativeObject.call("onClick", new Object[]{});
-							}
-						});
-					}
-
-					final AlertDialog dialog = builder.create();
-					dialog.setOnDismissListener(new DialogInterface.OnDismissListener()
+					
+					builder.setMessage(message);
+					builder.setCancelable(true);
+					
+					builder.setPositiveButton("OK", new DialogInterface.OnClickListener()
 					{
 						@Override
-						public void onDismiss(DialogInterface dialog)
+						public void onClick(DialogInterface dialog, int which)
 						{
-							synchronized (lock)
-							{
-								lock.notify();
-							}
+							dialog.dismiss();
 						}
 					});
-					dialog.show();
+					
+					builder.show();
 				}
 				catch (Exception e)
 				{
-					Log.e(LOG_TAG, e.toString());
+					Log.e(LOG_TAG, "Error showing alert dialog: " + e.toString());
 				}
 			}
 		});
-
-		synchronized (lock)
-		{
-			try
-			{
-				lock.wait();
-			}
-			catch (InterruptedException e)
-			{
-				Log.e(LOG_TAG, e.toString());
-			}
-		}
 	}
 
 	/**
