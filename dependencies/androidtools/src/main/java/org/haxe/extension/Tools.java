@@ -294,17 +294,29 @@ public class Tools extends Extension
 	public static void requestPermissions(String[] permissions, int requestCode)
 	{
 		List<String> ungrantedPermissions = new ArrayList<>();
-
+	
 		try
 		{
 			for (String permission : permissions)
 			{
 				if (Extension.mainActivity.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED)
 					ungrantedPermissions.add(permission);
-        		}
-
+			}
+	
 			if (!ungrantedPermissions.isEmpty())
-				Extension.mainActivity.requestPermissions(ungrantedPermissions.toArray(new String[0]), requestCode);
+			{
+				mainActivity.runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						try {
+							Thread.sleep(100);
+						} catch (InterruptedException e) {
+							// Just ignore it
+						}
+						Extension.mainActivity.requestPermissions(ungrantedPermissions.toArray(new String[0]), requestCode);
+					}
+				});
+			}
 		}
 		catch (Exception e)
 		{
